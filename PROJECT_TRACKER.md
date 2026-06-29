@@ -10,9 +10,9 @@
 
 | Metric | Value |
 |--------|-------|
-| **Current Phase** | Phase 15 complete — awaiting Phase 16 |
-| **Overall Progress** | 15 / 17 phases complete |
-| **Project State** | Render deployment config ready — deploy via Render dashboard |
+| **Current Phase** | Phase 16 complete — awaiting Phase 17 |
+| **Overall Progress** | 16 / 17 phases complete |
+| **Project State** | Frontend deployment config ready — deploy via Netlify or Vercel |
 | **Architecture** | Monorepo — backend at root, frontend in `client/` |
 
 ---
@@ -82,7 +82,7 @@ Both platforms connect to the **same GitHub repository** but use different **roo
 | 13 | Frontend Setup | ✅ Complete | 2026-06-29 | `client/` Vite + React + Tailwind, `studentService.js` |
 | 14 | Frontend UI | ✅ Complete | 2026-06-29 | Student table, forms, search/filter, pagination, CRUD |
 | 15 | Backend Deployment | ✅ Complete | 2026-06-29 | `render.yaml`, `deployment/RENDER_BACKEND.md`, production Postman env |
-| 16 | Frontend Deployment | ⬜ Pending | — | Netlify or Vercel from `client/` |
+| 16 | Frontend Deployment | ✅ Complete | 2026-06-29 | `netlify.toml`, `client/vercel.json`, deployment guide |
 | 17 | Documentation & Final Review | ⬜ Pending | — | README, viva prep, end-to-end verification |
 
 **Legend:** ⬜ Pending · 🔄 In Progress · ✅ Complete · ❌ Blocked
@@ -111,6 +111,7 @@ Both platforms connect to the **same GitHub repository** but use different **roo
 | 2026-06-29 | 13 | Scaffolded `client/` with Vite, React, Tailwind, and API service layer |
 | 2026-06-29 | 14 | Built minimal UI — table, CRUD forms, search/filter/sort/pagination |
 | 2026-06-29 | 15 | Added Render blueprint, deployment guide, production Postman env; CORS/index fixes |
+| 2026-06-29 | 16 | Added Netlify/Vercel config and `deployment/FRONTEND_DEPLOYMENT.md` |
 
 ---
 
@@ -174,7 +175,9 @@ Both platforms connect to the **same GitHub repository** but use different **roo
 | `client/src/constants/api.js` | 13 | ✅ Created | API path constants |
 | `client/src/utils/cn.js` | 13 | ✅ Created | Tailwind classname utility |
 | `client/src/components/` | 14 | ✅ Complete | 8 UI components |
-| `client/netlify.toml` or `client/vercel.json` | 16 | Pending | SPA routing & build config |
+| `client/netlify.toml` or `client/vercel.json` | 16 | ✅ Created | `netlify.toml` (root) + `client/vercel.json` |
+| `deployment/FRONTEND_DEPLOYMENT.md` | 16 | ✅ Created | Netlify & Vercel deployment guide |
+| `netlify.toml` | 16 | ✅ Created | Netlify monorepo build & SPA redirects |
 
 ---
 
@@ -599,13 +602,14 @@ cd client && npm run dev
 
 ### Frontend — Netlify or Vercel
 
-- [ ] Same GitHub repo connected
-- [ ] Base directory: `client`
-- [ ] Build command: `npm run build`
-- [ ] Publish directory: `dist`
+- [x] `netlify.toml` and `client/vercel.json` created
+- [ ] Same GitHub repo connected to Netlify or Vercel
+- [x] Base directory: `client`
+- [x] Build command: `npm run build`
+- [x] Publish directory: `dist`
 - [ ] Env var set: `VITE_API_URL` = Render backend URL
-- [ ] SPA redirect configured (all routes → `index.html`)
-- [ ] Backend `CLIENT_URL` updated to frontend production URL
+- [x] SPA redirect configured
+- [ ] Backend `CLIENT_URL` updated with frontend production URL
 - [ ] Full CRUD flow works in production browser
 
 ### Netlify vs Vercel
@@ -638,6 +642,6 @@ _Section to be filled during Phase 17._
 
 ## Next Step
 
-**Awaiting instruction to begin Phase 16: Frontend Deployment (Netlify or Vercel).**
+**Awaiting instruction to begin Phase 17: Documentation & Final Review.**
 
-Deploy backend on Render using `deployment/RENDER_BACKEND.md`, then proceed to Phase 16.
+Deploy frontend using `deployment/FRONTEND_DEPLOYMENT.md`, then proceed to Phase 17.
