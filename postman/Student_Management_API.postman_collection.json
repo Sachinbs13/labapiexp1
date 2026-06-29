@@ -1,0 +1,621 @@
+{
+  "info": {
+    "name": "Student Management API",
+    "description": "Complete Postman collection for the Student Management RESTful API.\n\nSetup:\n1. Import this collection and the environment file.\n2. Select the 'Student Management API - Local' environment.\n3. Start the server with `npm run dev`.\n4. Run requests in order within each folder.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Info",
+      "item": [
+        {
+          "name": "Root - API Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has success true', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 or 503', function () {",
+                  "    pm.expect([200, 503]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "pm.test('Response includes database status', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.database).to.have.property('status');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "API Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Lists student endpoints', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.endpoints.students).to.have.property('list');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Students - CRUD",
+      "item": [
+        {
+          "name": "Create Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Prathamesh Patil\",\n  \"usn\": \"1RV22CS001\",\n  \"email\": \"prathamesh@rvce.edu\",\n  \"phone\": \"9876543210\",\n  \"branch\": \"CSE\",\n  \"semester\": 6,\n  \"cgpa\": 8.5,\n  \"age\": 20,\n  \"gender\": \"Male\",\n  \"address\": \"RVCE Campus, Mysore Road, Bangalore\"\n}"
+            },
+            "url": "{{baseUrl}}/api/students"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Student created successfully', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.success).to.eql(true);",
+                  "    pm.expect(json.data.student).to.have.property('_id');",
+                  "    pm.environment.set('studentId', json.data.student._id);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get All Students",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response includes pagination', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data).to.have.property('total');",
+                  "    pm.expect(json.data).to.have.property('page');",
+                  "    pm.expect(json.data).to.have.property('students');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Student By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/{{studentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns correct student', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.student._id).to.eql(pm.environment.get('studentId'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Patch Student",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cgpa\": 9.0,\n  \"semester\": 7\n}"
+            },
+            "url": "{{baseUrl}}/api/students/{{studentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('CGPA updated', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.student.cgpa).to.eql(9);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Student (PUT)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Prathamesh Patil\",\n  \"usn\": \"1RV22CS001\",\n  \"email\": \"prathamesh@rvce.edu\",\n  \"phone\": \"9876543210\",\n  \"branch\": \"CSE\",\n  \"semester\": 7,\n  \"cgpa\": 9.0,\n  \"age\": 21,\n  \"gender\": \"Male\",\n  \"address\": \"RVCE Campus, Mysore Road, Bangalore\"\n}"
+            },
+            "url": "{{baseUrl}}/api/students/{{studentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Student fully updated', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.student.age).to.eql(21);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/{{studentId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Student deleted', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.message).to.include('deleted');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Search, Filter & Pagination",
+      "item": [
+        {
+          "name": "Search by Name or USN",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?search=1RV22",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "1RV22"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter by Branch",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?branch=CSE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "branch",
+                  "value": "CSE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter by Semester",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?semester=6",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "semester",
+                  "value": "6"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter by CGPA Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?minCgpa=8&maxCgpa=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "minCgpa",
+                  "value": "8"
+                },
+                {
+                  "key": "maxCgpa",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Sort by CGPA Descending",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?sort=-cgpa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "-cgpa"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pagination",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?page=1&limit=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Pagination metadata present', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data.limit).to.eql(5);",
+                  "    pm.expect(json.data.page).to.eql(1);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Field Selection",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?fields=name,usn,cgpa",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "fields",
+                  "value": "name,usn,cgpa"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Combined Query",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?branch=CSE&semester=6&sort=name&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "branch",
+                  "value": "CSE"
+                },
+                {
+                  "key": "semester",
+                  "value": "6"
+                },
+                {
+                  "key": "sort",
+                  "value": "name"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "Route Not Found",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/unknown"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid ObjectId",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/students/invalidid"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Validation Failed - Missing Fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\"\n}"
+            },
+            "url": "{{baseUrl}}/api/students"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "pm.test('Returns validation errors', function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.errors.length).to.be.above(0);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Duplicate USN",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Duplicate User\",\n  \"usn\": \"1RV22CS001\",\n  \"email\": \"duplicate@rvce.edu\",\n  \"phone\": \"9876543211\",\n  \"branch\": \"CSE\",\n  \"semester\": 6,\n  \"cgpa\": 8.0,\n  \"age\": 20,\n  \"gender\": \"Male\",\n  \"address\": \"RVCE Campus, Bangalore\"\n}"
+            },
+            "url": "{{baseUrl}}/api/students"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 409', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid Query Parameter",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?semester=99",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                {
+                  "key": "semester",
+                  "value": "99"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
